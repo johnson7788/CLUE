@@ -121,13 +121,18 @@ def clue_convert_examples_to_features(examples, tokenizer,
             raise KeyError(output_mode)
 
         if ex_index < 5:
-            logger.info("*** Example ***")
-            logger.info("guid: %s" % (example.guid))
+            logger.info(f"*** 样本{ex_index} ***")
+            logger.info(f"*** 最大序列长度: {max_length}, 任务模式: {output_mode}, labels: {label_list} ***")
+            logger.info("样本guid: %s" % (example.guid))
             logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
             logger.info("attention_mask: %s" % " ".join([str(x) for x in attention_mask]))
             logger.info("token_type_ids: %s" % " ".join([str(x) for x in token_type_ids]))
             logger.info("label: %s (id = %d)" % (example.label, label))
-            logger.info("input length: %d" % (input_len))
+            logger.info("样本的输入长度: %d" % (input_len))
+            logger.info("样本text_a处理后结果: %s" % (example.text_a))
+            logger.info("样本text_b处理后结果: %s" % (example.text_b))
+            logger.info("input_ids还原: %s" % " ".join(tokenizer.convert_ids_to_tokens(input_ids)))
+            logger.info("----" * 10)
 
         features.append(
             InputFeatures(input_ids=input_ids,
@@ -280,7 +285,7 @@ class CmnliProcessor(DataProcessor):
             guid = "%s-%s" % (set_type, i)
             text_a = line["sentence1"]
             text_b = line["sentence2"]
-            label = str(line["gold_label"]) if set_type != 'test' else 'neutral'
+            label = str(line["label"]) if set_type != 'test' else 'neutral'
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
